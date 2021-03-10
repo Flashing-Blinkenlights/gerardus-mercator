@@ -29,6 +29,7 @@ IGNORABLES  = ("minecraft:air",
                     "minecraft:spruce_leaves", "minecraft:birch_leaves",
                     "minecraft:acacia_leaves", "minecraft:jungle_leaves",
                 )
+LIQUIDS     = ("minecraft:water", "minecraft:lava")
 TRANSPARENT = ("glass", "fence", "trapdoor")
 WETNESSON   = True
 UNWETTABLE  = {"birch_log", "birch_wood"}
@@ -541,7 +542,8 @@ def findOuterWall(x, y, z):
             break
     for dx, dz in ORTHFACTORS:
         for h in range(UNITHEIGHT+1):
-            if getBlock(x+dx, y+h, z+dz) not in IGNORABLES:
+            block = getBlock(x+dx, y+h, z+dz)
+            if block not in IGNORABLES and block not in LIQUIDS:
                 if h > best[0]: best = h, (dx, dz)
                 break
         else:

@@ -1,16 +1,13 @@
 # ! /usr/bin/python3
-"""### Displays a map of the build area
-
-"""
+"""### Displays a map of the build area."""
 __all__ = ['WorldSlice']
 # __version__
 
+import blockColors
 import cv2
+import interfaceUtils
 import matplotlib.pyplot as plt
 import numpy as np
-
-import blockColors
-import interfaceUtils
 from worldLoader import WorldSlice
 
 rect = (0, 0, 128, 128)  # default build area

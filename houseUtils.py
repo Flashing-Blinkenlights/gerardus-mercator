@@ -1,5 +1,6 @@
+# ! /usr/bin/python3
 """
-Contains utilities for generating and managing houses
+Contains utilities for generating and managing houses.
 
 Each house is:
 X Composed of multiple horizontally cojoined, vertically stacked 5x4x5 units
@@ -40,6 +41,7 @@ WETBLOCKS = {"birch": "oak", "oak": "spruce", "spruce": "dark_oak",
 
 
 def setBlock(x, y, z, block, a="y", f="north", requirepunch=False):
+    """Place a block at a defined location."""
     if block == "-":
         return
     if requirepunch and getBlock(x, y, z) in IGNORABLES:
@@ -70,9 +72,12 @@ def setBlock(x, y, z, block, a="y", f="north", requirepunch=False):
 
 
 class Palette():
+    """Holds and manages a palette."""
+
     def __init__(self, pillar, joint, lightMat, heavyMat, window,
                  doorMat="spruce",
                  hasStuds=False, hasShutters=(False, True)):
+        """Initialise pallette with various settings."""
         self.pillar = pillar
         self.joint = joint
         self.lightMat = lightMat
@@ -84,6 +89,7 @@ class Palette():
         self.hasShutters = hasShutters
 
     def palettify(self, block):
+        """Translate placeholders into the appropriate blocks."""
         return block.format(pillar=self.pillar,
                             joint=self.joint,
                             lightMat=self.lightMat,
@@ -94,8 +100,11 @@ class Palette():
 
 
 palettes = {
-    "rustic": Palette("spruce_log", "spruce_wood", "spruce", "cobblestone", "glass_pane"),
-    "arid": Palette("sandstone", "chiseled_sandstone", "acacia", "smooth_sandstone", "air", "acacia", hasStuds=True, hasShutters=(False, False))
+    "rustic": Palette("spruce_log", "spruce_wood", "spruce",
+                      "cobblestone", "glass_pane"),
+    "arid": Palette("sandstone", "chiseled_sandstone", "acacia",
+                    "smooth_sandstone", "air", "acacia",
+                    hasStuds=True, hasShutters=(False, False))
 }
 
 if """Block with layer compositions for blueprints""":
@@ -146,28 +155,32 @@ if """Block with layer compositions for blueprints""":
     trapdoorwindow = (
         "-", "-", "{doorMat}_trapdoor[half=top, open=true, facing={facing}]")
 
-    #light_joint  = ("{lightMat}_slab",   "air",              "air",              "{joint}")
-    #heavy_joint  = ("{heavyMat}_slab",   "air",              "air",              "{joint}")
-    #lanternpost = ("-",    "{lightMat}_fence", "lantern")
-    #raised_lanternpost  = ("-",                 "{lightMat}_log",   "{lightMat}_fence", "lantern")
-    #loglamppost     = ("redstone_torch",    "{lightMat}_log",   "redstone_lamp",    "{lightMat}_slab")
-    # beam_cleared       = ("-",                 "air",          "air",          "{pillar}")
-    # heavywall_beam       = ("{heavyMat}",        "{heavyMat}",   "{heavyMat}",   "{pillar}")
-    # lightwall           = ("{lightMat}",        "{lightMat}",   "{lightMat}",   "{lightMat}")
-    # lightceil_cleared   = ("-",                 "air",  "air",  "{lightMat}_slab[type=top]")
-    # lightroom       = ("{lightMat}_slab",   "air",  "air",  "{lightMat}_slab[type=top]")
+    # light_joint  = ("{lightMat}_slab", "air", "air", "{joint}")
+    # heavy_joint  = ("{heavyMat}_slab", "air", "air", "{joint}")
+    # lanternpost = ("-", "{lightMat}_fence", "lantern")
+    # raised_lanternpost=("-", "{lightMat}_log", "{lightMat}_fence", "lantern")
+    # loglamppost = ("redstone_torch", "{lightMat}_log",
+    #                "redstone_lamp", "{lightMat}_slab")
+    # beam_cleared = ("-", "air", "air", "{pillar}")
+    # heavywall_beam = ("{heavyMat}", "{heavyMat}", "{heavyMat}",    pillar}")
+    # lightwall = ("{lightMat}", "{lightMat}", "{lightMat}", "{lightMat}")
+    # lightceil_cleared   = ("-", "air",  "air",  "{lightMat}_slab[type=top]")
+    # lightroom   = ("{lightMat}_slab","air","air","{lightMat}_slab[type=top]")
     # smallwind_empty  = ("-", "air")
     # longwind        = ("-", "{window}", "{window}")
     # longwind_empty   = ("-", "air",      "air")
 
 
 class BlueprintClass():
+    """Contains the 'recipe' for a particular build style."""
+
     def __init__(self,
                  outercorner, cojoining, innercorner, surrounded,
                  wall, corridor,
                  room,
                  window
                  ):
+        """Initialise with various designs for different house parts."""
         #   posts
         self.outercorner = outercorner
         self.cojoining = cojoining
@@ -182,29 +195,31 @@ class BlueprintClass():
         self.window = window
 
     def modify(self,
-               outercorner=None, cojoining=None, innercorner=None, surrounded=None,
+               outercorner=None, cojoining=None,
+               innercorner=None, surrounded=None,
                wall=None, corridor=None,
                room=None,
                window=None):
+        """Adjust the blueprint for variations."""
         #   posts
-        if outercorner != None:
+        if outercorner is not None:
             self.outercorner = outercorner
-        if cojoining != None:
+        if cojoining is not None:
             self.cojoining = cojoining
-        if innercorner != None:
+        if innercorner is not None:
             self.innercorner = innercorner
-        if surrounded != None:
+        if surrounded is not None:
             self.surrounded = surrounded
         #   walls
-        if wall != None:
+        if wall is not None:
             self.wall = wall
-        if corridor != None:
+        if corridor is not None:
             self.corridor = corridor
         #   rooms
-        if room != None:
+        if room is not None:
             self.room = room
         # windows
-        if window != None:
+        if window is not None:
             self.window = window
 
 
@@ -238,8 +253,9 @@ if """Block with blueprint classes""":
     transitionframeClass = copy(heavyframeClass)
     transitionframeClass.modify(room=light_heavy)
 
-    aridClass = BlueprintClass(*2 * [heavywall_beam], fullheavy_lantern, heavy_fencepole,
-                               heavywall_beam, *2 * [fullheavy_trapdoor], trapdoorwindow)
+    aridClass = BlueprintClass(*2 * [heavywall_beam], fullheavy_lantern,
+                               heavy_fencepole, heavywall_beam,
+                               *2 * [fullheavy_trapdoor], trapdoorwindow)
 
 if """Block with blueprint sets""":
     ignored = len(DESIGNATIONS) * [ignoredClass]
@@ -254,12 +270,13 @@ blueprint_collections = {"rustic": {"ground": rusticground, "regular": rustic},
 
 
 class Floor():
-    def __init__(self, grid, blueprintset=ignored, window=ignored, level=0, max=MAXHEIGHT, pool=DEFAULT_POOL):
+    """Contains data and methods for generating a floor of a building."""
+
+    def __init__(self, grid, blueprintset=ignored, window=ignored,
+                 level=0, max=MAXHEIGHT, pool=DEFAULT_POOL):
+        """Initialise with particular settings for instructing construction."""
         if level >= max:
             pool = [1]
-
-        ## DEBUG: print()
-        ## DEBUG: print(repr(grid).replace("], [", "]\n["))
 
         self.pool = pool
         self.grid = [[0 for i in range(len(grid[0]))] for j in range(
@@ -274,6 +291,7 @@ class Floor():
                 self.setBlueprints(x, y, item, blueprintset[int(item)])
 
     def setBlueprints(self, x, y, item, blueprintclass):
+        """Places appropriate blueprint in container."""
         if ispostindex(x, y):
             if item % 1 >= 0.3:
                 self.blueprints[x][y] = blueprintclass.surrounded
@@ -298,6 +316,7 @@ class Floor():
             raise Exception("Unexpected index values")
 
     def planroomabove(self, x, y):
+        """Plan the floor layout above."""
         self.grid[x][y] = choice(self.pool)
         for u in range(-1, 2):
             for v in range(-1, 2):
@@ -317,14 +336,13 @@ class Floor():
                     elif int(self.grid[x + u][y + v]) < 2:
                         self.grid[x + u][y + v] = 2
 
-        ## DEBUG: print()
-        ## DEBUG: print(repr(self.grid).replace("], [", "]\n["))
-
 
 class House():
+    """Contains data and functions for building houses."""
 
     # TODO: add roadaccessat
     def __init__(self, address, xsize, ysize, theme):
+        """Initialise with position, size and theme."""
         self.address = address
         self.xsize = (xsize - 1) // UNITSIZE
         self.ysize = (ysize - 1) // UNITSIZE
@@ -345,18 +363,23 @@ class House():
         else:
             print("Impossible size.")
             grid = [[0]]
-        #print("{}x{}: \n{}\n---".format(self.xsize, self.ysize, grid).replace("], [", "],\n["))
-        while grid != [[0 for i in range(len(grid[0]))] for j in range(len(grid))]:
+        while grid != [[0 for i in range(len(grid[0]))]
+                       for j in range(len(grid))]:
             if len(self.floors) == 0:
-                self.floors += [Floor(grid, self.blueprint_collection["ground"],
-                                      self.blueprint_collection["ground"][2].window)]
+                self.floors += [
+                    Floor(grid, self.blueprint_collection["ground"],
+                          self.blueprint_collection["ground"][2].window)
+                ]
             else:
-                self.floors += [Floor(grid, self.blueprint_collection["regular"],
-                                      self.blueprint_collection["regular"][2].window, len(self.floors))]
+                self.floors += [
+                    Floor(grid, self.blueprint_collection["regular"],
+                          self.blueprint_collection["regular"][2].window,
+                          len(self.floors))
+                ]
             grid = self.floors[-1].grid
 
     def build(self, xorig, yorig, zorig):
-
+        """Construct the building floor by floor."""
         xorig = xorig + self.ybuffer // 2 + \
             (self.ybuffer % 2 > 0) * choice([0, 1])
         zorig = zorig + self.xbuffer // 2 + \
@@ -364,9 +387,6 @@ class House():
 
         for floorno, floor in enumerate(self.floors):
             y = yorig + floor2height(floorno)
-
-            # DEBUG: print()
-            # DEBUG: print(repr(floor.grid).replace("], [", "]\n[").replace(", ", "\t"))
 
             self.buildGeometry(xorig, yorig, zorig, floorno, floor)
             for ux, row in enumerate(floor.blueprints):
@@ -380,10 +400,12 @@ class House():
                         elif isywallindex(ux, uy):
                             axis = "z"
                         if floorno == 0:
-                            item = self.blueprint_collection["ground"][2].window
+                            item = self.blueprint_collection["ground"][2] \
+                                .window
                             self.punchWindow(x, y, z, item, axis)
                         else:
-                            item = self.blueprint_collection["regular"][2].window
+                            item = self.blueprint_collection["regular"][2] \
+                                .window
                             self.punchWindow(x, y, z, item, axis)
 
             self.makeNavigable(xorig, yorig, zorig, floorno, floor)
@@ -391,7 +413,8 @@ class House():
         for floorno, floor in enumerate(self.floors):
             self.decorateWalls(xorig, yorig, zorig, floorno, floor)
 
-    def buildGeometry(self, xorig, yorig, zorig, floorno, floor):  # basic shape and windows
+    def buildGeometry(self, xorig, yorig, zorig, floorno, floor):
+        """Build the basic geometry of the house."""
         y = yorig + floor2height(floorno)
         for ux, row in enumerate(floor.blueprints):
             for uy, item in enumerate(row):
@@ -424,24 +447,26 @@ class House():
                 if iswallindex(ux, uy) and choice([True, False]):
                     self.doors.append((x, y, z, axis))
 
-    def placeBlueprint(self, x, y, z, item, axis="y", facing="north", requirepunch=False):
+    def placeBlueprint(self, x, y, z, item,
+                       axis="y", facing="north", requirepunch=False):
+        """Place blocks according to blueprint."""
         for h, block in enumerate(item):
             block = self.palette.palettify(block)
             setBlock(x, y + h, z, block, axis, facing, requirepunch)
 
     def punchWindow(self, x, y, z, blueprint, axis):
+        """Remove part of a wall to create a window."""
         xorig, yorig, zorig = x, y, z
-        x, _, z = getUnitMiddle(x, 0, z, axis)
+        x, _, z = getWallMiddle(x, 0, z, axis)
         factor = findOuterWall(x, y, z)
         if factor == (0, 0):
             input((x, y, z))
         facing = factor2facing(factor)
-        # DEBUG: input("{}, {}, {} | {}:\n\t{}".format(x, y, z, axis, blueprint))
         self.placeBlueprint(x, y, z, blueprint, axis, facing, True)
         self.windows.append((xorig, yorig, zorig))
 
     def makeNavigable(self, xorig, yorig, zorig, floorno, floor):
-
+        """Calculate navigable areas and connect them."""
         # calculate road connection
 
         # calculate traffic flow/rooms
@@ -454,6 +479,7 @@ class House():
         # insert ladders to lower floor
 
     def punchDoor(self, xorig, yorig, zorig, axis):
+        """Remove part of a wall to create a door."""
         x, y, z = xorig, yorig, zorig
 
         result = findAccessHeight(x, y, z)
@@ -462,7 +488,7 @@ class House():
         h, stairsat = result
         y += h
 
-        x, _, z = getUnitMiddle(x, 0, z, axis)
+        x, _, z = getWallMiddle(x, 0, z, axis)
         factor = findOuterWall(x, y, z)
         facing = factor2facing(factor)
         direction = factor2facing(invertfactor(factor))
@@ -471,10 +497,10 @@ class House():
                 return
             y += 1
 
-        if stairsat != None:
+        if stairsat is not None:
             block = self.palette.palettify("{doorMat}_stairs[facing={facing}]")
-            setBlock(x + stairsat[0], y - 1, z +
-                     stairsat[1], block, f=direction)
+            setBlock(x + stairsat[0], y - 1, z + stairsat[1],
+                     block, f=direction)
         if "fence" in getBlock(x, y, z):
             block = self.palette.palettify(
                 "{doorMat}_fence_gate[facing={facing}]")
@@ -487,10 +513,11 @@ class House():
                      f=facing, requirepunch=True)
         try:
             self.windows.remove((xorig, yorig, zorig))
-        except:
+        except ValueError:
             pass
 
     def decorateWalls(self, xorig, yorig, zorig, floorno, floor):
+        """Add decorative elements to walls."""
         y = yorig + floor2height(floorno)
 
         for window in self.windows:
@@ -508,6 +535,7 @@ class House():
                     self.placeStuds(x, y + UNITSIZE - 1, z)
 
     def placeShutters(self, x, y, z, block="{doorMat}"):
+        """Places single-height shutters at the appropriate points."""
         block = self.palette.palettify(
             block) + "_trapdoor[open=true, facing={facing}]"
         factor = findOuterWall(x, y, z)
@@ -523,6 +551,7 @@ class House():
             raise Exception("Unexpected set of factors")
 
     def placeStuds(self, x, y, z, amount=UNITSIZE - 1):
+        """Place decorative studs at the appropriate position."""
         if getBlock(x, y, z) in IGNORABLES:
             return
         factor = findOuterWall(x, y, z)
@@ -536,6 +565,7 @@ class House():
 
 
 def index2coord(index):
+    """Translate grid index into local coordinate value."""
     coord = UNITSIZE * (index // 2)
     if index % 2 != 0:
         coord += 1
@@ -543,6 +573,7 @@ def index2coord(index):
 
 
 def coord2index(coord):
+    """Translate local coordinate value into grid index."""
     index = 2 * (coord // UNITSIZE)
     if index % UNITSIZE != 0:
         coord += 1
@@ -550,54 +581,66 @@ def coord2index(coord):
 
 
 def factor2axis(factor):
+    """Convert directional factors to an axis."""
     return "z" if factor[0] == 0 else "x"
 
 
 def factor2facing(factor):
+    """Convert directional factors to a cardinal direction."""
     table = {(1, 0): "east", (-1, 0): "west",
              (0, 1): "south", (0, -1): "north"}
     return table[factor]
 
 
 def direction2factor(direction):
+    """Convert cardinal direction to directional factor."""
     table = {"east": (1, 0), "west": (-1, 0),
              "south": (0, 1), "north": (0, -1)}
     return table[direction]
 
 
 def floor2height(floor):
+    """Convert floor number to block height."""
     return UNITHEIGHT * floor
 
 
 def perpabsfactor(factor):
+    """Convert factor into the perpendicular absolute factor."""
     return (abs(factor[1]), abs(factor[0]))
 
 
 def invertfactor(factor):
+    """Invert a factor."""
     return (-factor[0], -factor[1])
 
 
 def ispostindex(x, y):
+    """Examine whether index is a post location."""
     return (True if x % 2 == 0 and y % 2 == 0 else False)
 
 
 def isroomindex(x, y):
+    """Examine whether index is a room location."""
     return (True if x % 2 == 1 and y % 2 == 1 else False)
 
 
 def iswallindex(x, y):
+    """Examine whether index is a wall location."""
     return isxwallindex(x, y) or isywallindex(x, y)
 
 
 def isxwallindex(x, y):
+    """Examine whether index is a wall location along the X-axis."""
     return (True if x % 2 == 1 and y % 2 == 0 else False)
 
 
 def isywallindex(x, y):
+    """Examine whether index is a wall location along the Y-axis."""
     return (True if x % 2 == 0 and y % 2 == 1 else False)
 
 
-def getUnitMiddle(x=0, y=0, z=0, axis="y"):
+def getWallMiddle(x=0, y=0, z=0, axis="y"):
+    """Return the center coordinates of a wall."""
     y += UNITHEIGHT // 2
     if axis == "x":
         x += (UNITSIZE - 1) // 2
@@ -607,6 +650,7 @@ def getUnitMiddle(x=0, y=0, z=0, axis="y"):
 
 
 def findAccessHeight(x, y, z):
+    """Discover the ideal position for a door."""
     check, laststairs = checkFreeSides(x, y, z)
     h = 0
     while check > 1:
@@ -616,24 +660,28 @@ def findAccessHeight(x, y, z):
         h += 1
         stairsat = laststairs
         check, laststairs = checkFreeSides(x, y + h, z)
-    if stairsat and getBlock(x + stairsat[0], y + h - 2, z + stairsat[1]) in IGNORABLES:
+    if (stairsat and getBlock(x + stairsat[0], y + h - 2, z + stairsat[1])
+            in IGNORABLES):
         return None
     return h, stairsat
 
 
 def checkFreeSides(x, y, z, ignoreWater=True):
+    """Determine which side is the most accessible."""
     sidecount = 0
     lastfree = None
     for dx, dz in ORTHFACTORS:
         if getBlock(x + dx, y, z + dz) in IGNORABLES \
-                or (not ignoreWater and getBlock(x + dx, y, z + dz) == "minecraft:water"):
+                or (not ignoreWater
+                    and getBlock(x + dx, y, z + dz) == "minecraft:water"):
             sidecount += 1
             lastfree = (dx, dz)
     return sidecount, lastfree
 
 
 def findOuterWall(x, y, z):
-    # WARNING: cardinal directions are inverted for ease of use when building walls
+    """Determine the directional factor towards the outside of a wall."""
+    # WARNING: cardinal directions are inverted for ease of use
     best = [-1, ()]
     for h in range(UNITHEIGHT + 1):
         if checkFreeSides(x, y + h, z, False)[0] > 0:
@@ -654,19 +702,17 @@ def findOuterWall(x, y, z):
 
 
 def findGround(x, z, y=127):
+    """Determine the ground height (works in caves)."""
     while getBlock(x, y, z) in IGNORABLES:
         y -= 1
     return y
 
 
 def getThemes():
-    return [name for name in palettes.keys() if name in blueprint_collections.keys()]
+    """Return all themes."""
+    return [name for name in palettes.keys()
+            if name in blueprint_collections.keys()]
 
-# TODO: def placeSign(x, y, z, rotation, text1="", text2="", text3="", text4=""):
+# TODO: def placeSign(x, y, z, rotation, text1="", text2="", ...):
 
-# def greenify(x, y, z):
-    #y = findGround(x, z, y)
-    #setBlock(x, y-1, z, "minecraft:dispenser[facing=up]{Items:[{Slot:0,id:bone_meal,Count:2}]}")
-    #interfaceUtils.runCommand("data {} {} {} ")
-    #setBlock(x, y-1, z, "dirt")
-    #setBlock(x, y-2, z, "dirt")
+# TODO: def greenify(x, y, z):
